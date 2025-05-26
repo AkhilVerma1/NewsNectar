@@ -11,7 +11,7 @@ import SwiftUI
 struct NewsNectarApp: App {
     var body: some Scene {
         WindowGroup {
-            NRDashboardView()
+            NRDashboardView(viewModel: .init())
         }
     }
 }

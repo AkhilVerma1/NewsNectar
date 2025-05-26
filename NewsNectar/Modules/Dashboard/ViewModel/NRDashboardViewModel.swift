@@ -9,8 +9,23 @@
 import Foundation
 
 class NRDashboardViewModel: ObservableObject {
-
     private let navigationTitle = "Dashboard"
+    var articles: NRDashboardArticleAPIModel?
+    private let fetchNewsUseCase: NRDashboardFetchNewsUseCase
+
+    init(_ fetchNewsUseCase: NRDashboardFetchNewsUseCase = NRDefaultDashboardFetchNewsUseCase()) {
+        self.fetchNewsUseCase = fetchNewsUseCase
+    }
+
+    @MainActor
+    func viewDidLoad() async {
+        do {
+            articles = try await fetchNewsUseCase.execute()
+            objectWillChange.send()
+        } catch {
+            debugPrint(error)
+        }
+    }
 
     func getNavigationTitle() -> String {
         navigationTitle

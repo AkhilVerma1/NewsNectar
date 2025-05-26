@@ -7,14 +7,44 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct NRDashboardView: View {
     @StateObject var viewModel: NRDashboardViewModel
-
+    
     var body: some View {
         NavigationStack {
-            Text("Hello, World!")
-                .navigationTitle(viewModel.getNavigationTitle())
+            List {
+                if let articles = viewModel.articles {
+                    Text("\(articles.totalResults)")
+                    
+                    ForEach(articles.articles, id: \.url) { article in
+                        VStack {
+                            Text(article.title)
+                            Text(article.description)
+                            Text(article.content)
+                            
+                            if let imageUrl = URL(string: article.urlToImage) {
+                                KFImage(imageUrl)
+                                    .placeholder {
+                                        ProgressView()
+                                    }
+                                    .retry(maxCount: 3, interval: .seconds(2))
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .clipShape(Circle())
+                            }
+                        }
+                        .padding()
+                    }
+                }
+            }
+            .onAppear {
+                Task {
+                    await viewModel.viewDidLoad()
+                }
+            }
+            .navigationTitle(viewModel.getNavigationTitle())
         }
     }
 }
